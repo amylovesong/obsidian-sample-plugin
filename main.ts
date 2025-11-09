@@ -1,4 +1,4 @@
-import { App, Editor, MarkdownView, Modal, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
+import { App, Editor, MarkdownView, Modal, moment, Notice, Plugin, PluginSettingTab, Setting } from 'obsidian';
 
 // Remember to rename these classes and interfaces!
 
@@ -16,13 +16,17 @@ export default class MyPlugin extends Plugin {
 	async onload() {
 		await this.loadSettings();
 
-		// This creates an icon in the left ribbon.
-		const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (_evt: MouseEvent) => {
-			// Called when the user clicks the icon.
-			new Notice('This is a notice!');
-		});
-		// Perform additional things with the ribbon
-		ribbonIconEl.addClass('my-plugin-ribbon-class');
+		// // This creates an icon in the left ribbon.
+		// const ribbonIconEl = this.addRibbonIcon('dice', 'Sample Plugin', (_evt: MouseEvent) => {
+		// 	// Called when the user clicks the icon.
+		// 	new Notice('This is a notice!');
+		// });
+		// // Perform additional things with the ribbon
+		// ribbonIconEl.addClass('my-plugin-ribbon-class');
+
+		this.addRibbonIcon('dice', 'Greet~~', () => {
+			new Notice('Hello, world!');
+		})
 
 		// This adds a status bar item to the bottom of the app. Does not work on mobile apps.
 		const statusBarItemEl = this.addStatusBarItem();
@@ -45,6 +49,27 @@ export default class MyPlugin extends Plugin {
 				editor.replaceSelection('Sample Editor Command');
 			}
 		});
+
+		this.addCommand({
+			id: 'insert-todays-date',
+			name: 'Insert today\'s date',
+			editorCallback: (editor: Editor) => {
+				editor.replaceRange(
+					moment().format('YYYY-MM-DD'),
+					editor.getCursor()
+				)
+			}
+		})
+
+		this.addCommand({
+			id: 'convert-to-uppercase',
+			name: 'Convert to uppercase',
+			editorCallback: (editor: Editor) => {
+				const selection = editor.getSelection();
+				editor.replaceSelection(selection.toUpperCase());
+			}
+		})
+
 		// This adds a complex command that can check whether the current state of the app allows execution of the command
 		this.addCommand({
 			id: 'open-sample-modal-complex',
