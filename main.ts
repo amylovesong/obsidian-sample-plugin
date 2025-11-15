@@ -10,6 +10,12 @@ const DEFAULT_SETTINGS: MyPluginSettings = {
 	mySetting: 'default'
 }
 
+const ALL_EMOJIS: Record<string, string> = {
+	':+1:': '👍',
+	':sunglasses:': '😎',
+	':smile:': '😄',
+}
+
 export default class MyPlugin extends Plugin {
 	settings: MyPluginSettings;
 
@@ -101,6 +107,22 @@ export default class MyPlugin extends Plugin {
 
 		// When registering intervals, this function will automatically clear the interval when the plugin is disabled.
 		this.registerInterval(window.setInterval(() => console.log('setInterval'), 5 * 60 * 1000));
+		
+		// Use Markdown post processor to change how a Markdown document is rendered in Reading view.
+		this.registerMarkdownPostProcessor((element, context) => {
+			const codeblocks = element.findAll('code');
+			console.log('codeblocks', codeblocks)
+
+			for (const codeblock of codeblocks) {
+				const text = codeblock.innerText.trim();
+				if (text[0] === ':' && text[text.length - 1] === ':') {
+					const emojiEl = codeblock.createSpan({
+						text: ALL_EMOJIS[text] ?? text,
+					});
+					codeblock.replaceWith(emojiEl);
+				}
+			}
+		});
 	}
 
 	onunload() {
